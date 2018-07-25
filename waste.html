@@ -1,0 +1,93 @@
+def emailNotification(buildstatus,sysdate,TCresult){
+  def emailBody="";
+  def TCresults="${TCresult}"
+  def imgpath='"'+"a.png"+'"'
+   def recipentlist="";
+ // def recipentlist="preetish.das@i-exceed.com,darshanl.sagar@i-exceed.com,shyam.kumar@i-exceed.com,amar.khan@i-exceed.com,cc:chandu.balaji@i-exceed.com"
+  def binaryPath='\\'+'\\192.168.1.6\\appzillontesting\\3.6.0\\'+"${sysdate}"
+  if("${buildstatus}"=='Started'){
+    recipentlist="preetish.das@i-exceed.com,prudhvi.kumar@i-exceed.com,darshanl.sagar@i-exceed.com,shyam.kumar@i-exceed.com,amar.khan@i-exceed.com,cc:chandu.balaji@i-exceed.com" 
+      //recipentlist=recipentlist+',ushant.mukherjee@i-exceed.com'
+     emailBody= """<p>Hi All,</p><p>AppzillonStudio-3.6.0 build triggered.<br>Please find the latest build details below.</p><p style="background-color:LightGreen ;">Check console output at <a href='${env.BUILD_URL}'>${env.JOB_NAME}[${env.BUILD_NUMBER}]</a></p><p>Regards,<br>Appzillon DevTeam<br>I-Exceed Technology Solutions</p>"""
+  }
+  else if("${buildstatus}"=='Success'){
+    recipentlist="amar.khan@i-exceed.com,prudhvi.kumar@i-exceed.com"
+  //   recipentlist="prudhvi.kumar@i-exceed.com"
+     emailBody= """<html><head><style>body {background-color: lightblue;}h1 {color: white;text-align: center;}p {font-family: verdana;font-size: 20px;</style></head><body><h1>Appzillon Health Check</h1>
+<p style="color:#074207;">Hi All, <br><br> AppzillonStudio-3.6.0 Build with Automation Testing Succeeded: <br><br>Click <a href='http://192.168.1.6/Report.html'>here </a>for Testcase Report <br>Click <a href='http://192.168.1.6/AppzillonTest.html'>here </a>for Testcase logs <br>Click <a href='http://192.168.5.254:9000/dashboard?id=com.iexceed.apz%3Aparent-appzillonstudio'>here </a>for Sonarqube Code Analysis Report <br><br>Job ${env.JOB_NAME} [${env.BUILD_NUMBER}] <br></br>Please find the latest build details below.<br><table border="1px solid black"><tr><td>Binary Path</td><td>${binaryPath}</td></tr></table><br><b>TestCase Matrix</b><br>"<table border="3" ><tr><th>Total</th><th>Passed</th><th>Failed</th></tr><tr><td>sum</td><td>Psum</td><td>Fsum</td></tr></table><br> Check console output for testing at <a href='${env.BUILD_URL}'>${env.JOB_NAME} [${env.BUILD_NUMBER}]</a><br><br>Regards,<br><br>Appzillon IDE Team<br>I-Exceed Technology Solutions<br><img src=${imgpath} alt="Girl in a jacket"></p></body></html>""" 
+  
+      echo "${emailBody}"
+  }
+  else{
+    recipentlist="preetish.das@i-exceed.com,prudhvi.kumar@i-exceed.com,darshanl.sagar@i-exceed.com,shyam.kumar@i-exceed.com,amar.khan@i-exceed.com,cc:chandu.balaji@i-exceed.com"
+  //   recipentlist="prudhvi.kumar@i-exceed.com"
+     emailBody= """<p style="color:red;">Hi All, <br><br> AppzillonStudio-3.6.0 build ${buildstatus}: Job ${env.JOB_NAME} [${env.BUILD_NUMBER}] <br><br> Check console output at <a href='${env.BUILD_URL}'>${env.JOB_NAME} [${env.BUILD_NUMBER}]</a><br><br>Regards,<br><br>Appzillon IDE Team<br>I-Exceed Technology Solutions</p>"""
+  }
+  emailext (
+          subject: "Appzillon-3.6.0.S1 Build ${buildstatus}",
+          mimeType: 'text/html',
+          attachmentsPattern: 'test.html',
+          body: "${emailBody}",
+          to: "${recipentlist}",
+          replyTo: "jenkinsadmin@i-exceed.com",
+          from: 'jenkinsadmin@i-exceed.com',
+          recipientProviders: [[$class: 'CulpritsRecipientProvider']]
+           )
+}
+def defaulcotpath=""
+def x='/';
+def sysdate =""
+def nowdate=new Date().format( 'yyyyMMdd-HH-mm-ss' )
+def pass ='"p@ssw0rd"'
+def key ='"ab:a9:b8:34:48:0b:a5:0d:e3:56:ae:5e:41:2f:41:9b"'
+def buildnumber = env.BUILD_NUMBER
+def Macpass ='"madmac"'
+def Mackey ='"f8:bc:5c:a6:30:77:0b:61:c8:68:e7:d7:5a:25:ce:08"'
+pipeline{
+  agent any
+  stages{
+      stage('test mail'){
+          steps{
+              script{
+              
+echo "${params.val1}"
+echo "${params.val2}"
+sleep 10
+slackSend color:"#2eb886",channel: "#appzdev", message: "Build Details ** \n Build Status : `Success` \n Jobname : ${env.JOB_NAME} \n BuildNumber : ${env.BUILD_NUMBER}\n Url : <http://192.168.1.138:8080/job/nodepipline> \n Requester : Amar khan"
+
+
+//bat 'ipconfig&exit 1 >output.txt 2>&1'
+// cmd6 = sh (
+//     script: 'hostname',
+//     returnStdout: true
+// ).trim()
+
+//--bat '>output.txt (cd d:\\softs && plink -pw '+"${pass}"+' superuser@192.168.1.6 '+" -batch -hostkey "+"${key}"+" "+'cd /home/superuser/AppzAutomationTesting;./emailreport.sh)'
+//TCresult = readFile "${env.WORKSPACE}/output.txt"
+//echo "${TCresult}"
+//def notificationdata='''curl -X POST https://hooks.slack.com/services/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 -d "{'text':'hello'}"
+//   def load="'"+'{"text":"hello"}'+"'"
+//   bat 'cd d:\\softs && plink -pw '+"${pass}"+' superuser@192.168.1.6 '+" -batch -hostkey "+"${key}"+" "+"curl -X POST https://hooks.slack.com/services/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 -d ${load}"
+//bat 'cd d:\\softs && plink -pw '+"${pass}"+' superuser@192.168.1.6 '+" -batch -hostkey "+"${key}"+" "+'ifconfig'
+//echo "${tt}"
+}
+          }
+      //     post{
+      //     failure {  
+      //         script{
+      //       emailext (
+      //     subject: "Appzillon-3.6.0.S1 Build ",
+      //     mimeType: 'text/html',
+      //     body: '$DEFAULT_CONTENT',
+      //      attachmentsPattern: 'output.txt',
+      //     to: "amar.khan@i-exceed.com",
+      //     replyTo: "jenkinsadmin@i-exceed.com",
+      //     from: 'jenkinsadmin@i-exceed.com',
+      //     recipientProviders: [[$class: 'CulpritsRecipientProvider']]
+      //      )
+      //  }  
+      // }
+      // }
+     
+  } 
+}}
